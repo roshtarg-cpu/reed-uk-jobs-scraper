@@ -8,7 +8,7 @@ async function scrapeJobListings(page, maxResults) {
     let currentPage = 1;
     
     while (jobs.length < maxResults) {
-        await Actor.log.info(`Scraping page ${currentPage}, collected ${jobs.length}/${maxResults} jobs`);
+        console.log(`Scraping page ${currentPage}, collected ${jobs.length}/${maxResults} jobs`);
         
         // Wait for job cards to load
         await page.waitForSelector('article[data-qa="job-card"]', { timeout: 30000 });
@@ -52,7 +52,7 @@ async function scrapeJobListings(page, maxResults) {
             await Actor.pushData(job);
         }
         
-        await Actor.log.info(`Extracted ${pageJobs.length} jobs from page ${currentPage}`);
+        console.log(`Extracted ${pageJobs.length} jobs from page ${currentPage}`);
         
         if (jobs.length >= maxResults) break;
         
@@ -67,7 +67,7 @@ async function scrapeJobListings(page, maxResults) {
         });
         
         if (!hasNextPage) {
-            await Actor.log.info('No more pages available');
+            console.log('No more pages available');
             break;
         }
         
@@ -88,7 +88,7 @@ Actor.main(async () => {
         proxyConfiguration,
     } = input || {};
 
-    await Actor.log.info('Starting Reed.co.uk job scraper', { searchKeyword, location, maxResults });
+    console.log('Starting Reed.co.uk job scraper', { searchKeyword, location, maxResults });
 
     // Initialize proxy
     let proxyUrl = null;
@@ -97,7 +97,7 @@ Actor.main(async () => {
         const groups = proxyConfiguration.apifyProxyGroups || ['RESIDENTIAL'];
         const country = proxyConfiguration.apifyProxyCountry || 'GB';
         proxyUrl = `http://groups-${groups.join('+')},country-${country}:${proxyPassword}@proxy.apify.com:8000`;
-        await Actor.log.info('Using Apify proxy', { groups, country });
+        console.log('Using Apify proxy', { groups, country });
     }
 
     // Launch browser
@@ -121,7 +121,7 @@ Actor.main(async () => {
         if (location) params.append('location', location);
         if (params.toString()) searchUrl += `?${params.toString()}`;
 
-        await Actor.log.info(`Navigating to: ${searchUrl}`);
+        console.log(`Navigating to: ${searchUrl}`);
         await page.goto(searchUrl, { waitUntil: 'networkidle', timeout: 60000 });
         
         // Wait for content
@@ -130,10 +130,10 @@ Actor.main(async () => {
         // Scrape jobs
         const jobs = await scrapeJobListings(page, maxResults);
 
-        await Actor.log.info(`✅ Scraping complete. Total jobs scraped: ${jobs.length}`);
+        console.log(`✅ Scraping complete. Total jobs scraped: ${jobs.length}`);
 
     } catch (error) {
-        await Actor.log.error('Error during scraping:', error);
+        console.error('Error during scraping:', error);
         throw error;
     } finally {
         await browser.close();

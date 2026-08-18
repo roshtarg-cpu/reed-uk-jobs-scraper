@@ -2,6 +2,7 @@
   "name": "reed-uk-jobs-scraper",
   "version": "0.1.0",
   "description": "Scrape job listings from Reed.co.uk - UK's leading job board",
+  "type": "module",
   "main": "src/main.js",
   "scripts": {
     "start": "node src/main.js"
