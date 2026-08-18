@@ -5,40 +5,5 @@
   "description": "Scrape job listings from Reed.co.uk, UK's leading job board with 14M+ monthly visits. Extract job titles, companies, salaries, locations, and descriptions. Perfect for recruitment data, job market analysis, and AI agents. Works with Claude, ChatGPT, and AI agents via Apify MCP.",
   "version": "0.1",
   "buildTag": "latest",
-  "dockerfile": "./Dockerfile",
-  "storages": {
-    "dataset": {
-      "actorOutputSchemaVersion": 1,
-      "fields": {},
-      "views": {
-        "overview": {
-          "title": "Overview",
-          "transformation": {
-            "fields": ["title", "company", "location", "salary", "url"]
-          },
-          "display": {
-            "component": "table",
-            "properties": {
-              "title": {
-                "label": "Job Title"
-              },
-              "company": {
-                "label": "Company"
-              },
-              "location": {
-                "label": "Location"
-              },
-              "salary": {
-                "label": "Salary"
-              },
-              "url": {
-                "label": "URL",
-                "format": "link"
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+  "dockerfile": "./Dockerfile"
 }
