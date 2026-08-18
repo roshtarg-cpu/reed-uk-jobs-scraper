@@ -10,33 +10,82 @@ async function scrapeJobListings(page, maxResults) {
     while (jobs.length < maxResults) {
         console.log(`Scraping page ${currentPage}, collected ${jobs.length}/${maxResults} jobs`);
         
-        // Wait for job cards to load
-        await page.waitForSelector('article[data-qa="job-card"]', { timeout: 30000 });
+        // Wait for job cards to load (try different selectors)
+        await page.waitForSelector('article, div[data-qa*="job"], .job-card', { timeout: 30000 });
+        await page.waitForTimeout(2000);
         
         // Extract job data from current page
         const pageJobs = await page.evaluate(() => {
-            const jobCards = document.querySelectorAll('article[data-qa="job-card"]');
+            // Try multiple selector strategies
+            let jobCards = document.querySelectorAll('article[id^="job-card"]');
+            if (!jobCards.length) jobCards = document.querySelectorAll('article');
+            if (!jobCards.length) jobCards = document.querySelectorAll('[data-qa*="job"]');
+            
             const results = [];
             
             jobCards.forEach(card => {
                 try {
-                    const titleEl = card.querySelector('h2[data-qa="job-card-title"] a');
-                    const companyEl = card.querySelector('a[data-qa="job-card-employer"]');
-                    const locationEl = card.querySelector('li[data-qa="job-card-location"]');
-                    const salaryEl = card.querySelector('li[data-qa="job-card-salary"]');
-                    const dateEl = card.querySelector('li[data-qa="job-card-posted-date"]');
-                    const descEl = card.querySelector('p[data-qa="job-card-description"]');
+                    // Generic selector strategy - find links and text within card
+                    const allLinks = card.querySelectorAll('a');
+                    const headings = card.querySelectorAll('h1, h2, h3');
+                    const allText = card.innerText || '';
                     
-                    results.push({
-                        title: titleEl?.textContent?.trim() || null,
-                        company: companyEl?.textContent?.trim() || null,
-                        location: locationEl?.textContent?.trim() || null,
-                        salary: salaryEl?.textContent?.trim() || null,
-                        postedDate: dateEl?.textContent?.trim() || null,
-                        description: descEl?.textContent?.trim() || null,
-                        url: titleEl?.href ? new URL(titleEl.href, 'https://www.reed.co.uk').href : null,
-                        scrapedAt: new Date().toISOString()
-                    });
+                    // Find job title (usually first heading or first large link)
+                    let title = null;
+                    if (headings.length > 0) {
+                        title = headings[0].textContent?.trim();
+                    } else if (allLinks.length > 0) {
+                        title = allLinks[0].textContent?.trim();
+                    }
+                    
+                    // Find job URL (first link that looks like a job)
+                    let url = null;
+                    for (const link of allLinks) {
+                        if (link.href && (link.href.includes('/jobs/') || link.href.includes('job'))) {
+                            url = link.href;
+                            break;
+                        }
+                    }
+                    
+                    // Parse text for common patterns
+                    const lines = allText.split('\\n').map(l => l.trim()).filter(l => l);
+                    
+                    // Look for salary (£, $ patterns)
+                    let salary = null;
+                    for (const line of lines) {
+                        if (line.match(/£|\\$|per annum|p\\.a\\./i)) {
+                            salary = line;
+                            break;
+                        }
+                    }
+                    
+                    // Look for location (common UK cities/regions)
+                    let location = null;
+                    for (const line of lines) {
+                        if (line.match(/London|Manchester|Birmingham|Leeds|Remote|Home/i)) {
+                            location = line;
+                            break;
+                        }
+                    }
+                    
+                    // Get company (usually in a smaller text or second link)
+                    let company = null;
+                    if (allLinks.length > 1) {
+                        company = allLinks[1].textContent?.trim();
+                    }
+                    
+                    if (title && url) {
+                        results.push({
+                            title,
+                            company,
+                            location,
+                            salary,
+                            postedDate: null,
+                            description: lines[Math.min(2, lines.length - 1)] || null,
+                            url: url.startsWith('http') ? url : new URL(url, 'https://www.reed.co.uk').href,
+                            scrapedAt: new Date().toISOString()
+                        });
+                    }
                 } catch (e) {
                     console.warn('Error extracting job card:', e.message);
                 }
@@ -58,8 +107,8 @@ async function scrapeJobListings(page, maxResults) {
         
         // Try to go to next page
         const hasNextPage = await page.evaluate(() => {
-            const nextButton = document.querySelector('a[data-qa="pagination-next"]');
-            if (nextButton && !nextButton.classList.contains('disabled')) {
+            const nextButton = document.querySelector('a[rel="next"], a[aria-label*="Next"], .pagination__next, button:has-text("Next")');
+            if (nextButton) {
                 nextButton.click();
                 return true;
             }
@@ -72,7 +121,7 @@ async function scrapeJobListings(page, maxResults) {
         }
         
         // Wait for new page to load
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(3000);
         currentPage++;
     }
     
