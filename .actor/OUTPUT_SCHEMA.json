@@ -1,0 +1,74 @@
+{
+  "actorSpecification": 1,
+  "fields": {
+    "title": {
+      "title": "Job Title",
+      "type": "string",
+      "description": "The job position title"
+    },
+    "company": {
+      "title": "Company",
+      "type": "string",
+      "description": "Employer/recruiter name"
+    },
+    "location": {
+      "title": "Location",
+      "type": "string",
+      "description": "Job location (city/region)"
+    },
+    "salary": {
+      "title": "Salary",
+      "type": "string",
+      "description": "Salary range or compensation"
+    },
+    "postedDate": {
+      "title": "Posted Date",
+      "type": "string",
+      "description": "When the job was posted"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string",
+      "description": "Job description summary"
+    },
+    "url": {
+      "title": "URL",
+      "type": "string",
+      "description": "Direct link to the job listing"
+    },
+    "scrapedAt": {
+      "title": "Scraped At",
+      "type": "string",
+      "description": "ISO timestamp when data was collected"
+    }
+  },
+  "views": {
+    "overview": {
+      "title": "Overview",
+      "transformation": {
+        "fields": ["title", "company", "location", "salary", "url"]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "title": {
+            "label": "Job Title"
+          },
+          "company": {
+            "label": "Company"
+          },
+          "location": {
+            "label": "Location"
+          },
+          "salary": {
+            "label": "Salary"
+          },
+          "url": {
+            "label": "URL",
+            "format": "link"
+          }
+        }
+      }
+    }
+  }
+}
