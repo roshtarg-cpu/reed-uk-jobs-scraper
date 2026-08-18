@@ -1,0 +1,49 @@
+{
+  "actorSpecification": 1,
+  "name": "reed-uk-jobs-scraper",
+  "title": "Reed.co.uk Jobs Scraper — UK Job Listings API",
+  "description": "Scrape job listings from Reed.co.uk, UK's leading job board with 14M+ monthly visits. Extract job titles, companies, salaries, locations, and descriptions. Perfect for recruitment data, job market analysis, and AI agents. Works with Claude, ChatGPT, and AI agents via Apify MCP.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "dockerfile": "./Dockerfile",
+  "input": "./input_schema.json",
+  "output": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "template": "{{{title}}}"
+        },
+        "company": {
+          "type": "string",
+          "template": "{{{company}}}"
+        },
+        "location": {
+          "type": "string",
+          "template": "{{{location}}}"
+        },
+        "salary": {
+          "type": "string",
+          "template": "{{{salary}}}"
+        },
+        "postedDate": {
+          "type": "string",
+          "template": "{{{postedDate}}}"
+        },
+        "description": {
+          "type": "string",
+          "template": "{{{description}}}"
+        },
+        "url": {
+          "type": "string",
+          "template": "{{{url}}}"
+        },
+        "scrapedAt": {
+          "type": "string",
+          "template": "{{{scrapedAt}}}"
+        }
+      }
+    }
+  }
+}

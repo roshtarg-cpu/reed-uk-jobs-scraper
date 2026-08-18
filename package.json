@@ -1,0 +1,17 @@
+{
+  "name": "reed-uk-jobs-scraper",
+  "version": "0.1.0",
+  "description": "Scrape job listings from Reed.co.uk - UK's leading job board",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "dependencies": {
+    "apify": "^3.0.0",
+    "playwright": "^1.40.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/roshtarg-cpu/reed-uk-jobs-scraper"
+  }
+}
