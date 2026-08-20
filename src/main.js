@@ -131,8 +131,8 @@ async function scrapeJobListings(page, maxResults) {
 Actor.main(async () => {
     const input = await Actor.getInput();
     const {
-        searchKeyword = '',
-        location = '',
+        searchKeyword = 'software engineer',
+        location = 'London',
         maxResults = 50,
         proxyConfiguration,
     } = input || {};
